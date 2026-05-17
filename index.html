@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="google-site-verification" content="DlgOClkRgkmlf15lo59yPuYjX2Sun367yanHFyFWsxk" />
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Relationship Flip Counter</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #09090c;
+            --card-top: #f4f1ea;
+            --card-bottom: #e5dfd6;
+            --border: #cbc6be;
+            --text: #101010;
+            --label: #8f8a82;
+            --shadow: rgba(0, 0, 0, 0.7);
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 14px;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 1500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 38px;
+        }
+
+        .title {
+            text-align: center;
+        }
+
+        .title h1 {
+            color: white;
+            font-size: 40px;
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .title p {
+            color: var(--label);
+            letter-spacing: 4px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .clock {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 28px;
+        }
+
+        .group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .digits {
+            display: flex;
+            gap: 8px;
+        }
+
+        .label {
+            color: var(--label);
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        /* =========================
+           FLIP UNIT
+        ========================== */
+
+        .flip-unit {
+            position: relative;
+            width: 86px;
+            height: 126px;
+            perspective: 500px;
+        }
+
+        .flip-unit::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            box-shadow:
+                0 4px 14px var(--shadow),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .static-card,
+        .flip-card {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+
+        /* TOP */
+
+        .upper,
+        .top {
+            top: 0;
+            background: var(--card-top);
+            border-bottom: 1px solid var(--border);
+            border-radius: 12px 12px 0 0;
+            transform-origin: bottom;
+            align-items: flex-start;
+        }
+
+        /* BOTTOM */
+
+        .lower,
+        .bottom {
+            bottom: 0;
+            background: var(--card-bottom);
+            border-radius: 0 0 12px 12px;
+            transform-origin: top;
+            align-items: flex-end;
+        }
+
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 200%;
+            display: flex;
+            justify-content: center;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 92px;
+            line-height: 1;
+            color: var(--text);
+            letter-spacing: -2px;
+        }
+
+        .upper .face,
+        .top .face {
+            top: 0;
+            align-items: flex-start;
+            padding-top: 14px;
+        }
+
+        .lower .face,
+        .bottom .face {
+            bottom: 0;
+            align-items: flex-end;
+            padding-bottom: 14px;
+        }
+
+        .flip-card.top {
+            z-index: 10;
+            transform: rotateX(0deg);
+        }
+
+        .flip-card.bottom {
+            z-index: 9;
+            transform: rotateX(90deg);
+        }
+
+        @keyframes flipTop {
+            0% {
+                transform: rotateX(0deg);
+            }
+
+            100% {
+                transform: rotateX(-90deg);
+            }
+        }
+
+        @keyframes flipBottom {
+            0% {
+                transform: rotateX(90deg);
+            }
+
+            100% {
+                transform: rotateX(0deg);
+            }
+        }
+
+        .flip-card.top.flipping {
+            animation: flipTop .28s cubic-bezier(.4, 0, .2, 1) forwards;
+        }
+
+        .flip-card.bottom.flipping {
+            animation: flipBottom .28s cubic-bezier(.4, 0, .2, 1) forwards;
+            animation-delay: .24s;
+        }
+
+        @media (max-width: 900px) {
+
+            .flip-unit {
+                width: 70px;
+                height: 104px;
+            }
+
+            .face {
+                font-size: 74px;
+            }
+
+            .title h1 {
+                font-size: 28px;
+            }
+
+            .clock {
+                gap: 18px;
+            }
+        }
+
+        @media (max-width: 550px) {
+
+            .flip-unit {
+                width: 58px;
+                height: 90px;
+            }
+
+            .face {
+                font-size: 58px;
+            }
+
+            .clock {
+                gap: 14px;
+            }
+
+            .label {
+                font-size: 10px;
+                letter-spacing: 2px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wrapper">
+
+        <div class="title">
+            <h1>TIK TIK WITH U</h1>
+            <p>Since 15 February 2026 ❤️</p>
+        </div>
+
+        <div class="clock" id="clock"></div>
+
+    </div>
+
+    <script>
+
+        // ============================================
+        // CREATE FLIP DIGIT
+        // ============================================
+
+
+        function createFlipDigit(initialValue = '0') {
+
+            const flipUnit = document.createElement('div');
+            flipUnit.className = 'flip-unit';
+
+            // =========================
+            // STATIC CARDS
+            // =========================
+
+            const staticUpper = document.createElement('div');
+            staticUpper.className = 'static-card upper';
+
+            const staticLower = document.createElement('div');
+            staticLower.className = 'static-card lower';
+
+            const upperFace = document.createElement('div');
+            upperFace.className = 'face';
+
+            const lowerFace = document.createElement('div');
+            lowerFace.className = 'face';
+
+            staticUpper.appendChild(upperFace);
+            staticLower.appendChild(lowerFace);
+
+            // =========================
+            // FLIP CARDS
+            // =========================
+
+            const flipTop = document.createElement('div');
+            flipTop.className = 'flip-card top';
+
+            const flipBottom = document.createElement('div');
+            flipBottom.className = 'flip-card bottom';
+
+            const topFace = document.createElement('div');
+            topFace.className = 'face';
+
+            const bottomFace = document.createElement('div');
+            bottomFace.className = 'face';
+
+            flipTop.appendChild(topFace);
+            flipBottom.appendChild(bottomFace);
+
+            flipUnit.appendChild(staticUpper);
+            flipUnit.appendChild(staticLower);
+            flipUnit.appendChild(flipTop);
+            flipUnit.appendChild(flipBottom);
+
+            let current = initialValue;
+            let animating = false;
+
+            // ===================================
+            // FORCE INITIAL 0 RENDER
+            // ===================================
+
+            function renderValue(val) {
+
+                upperFace.textContent = val;
+                lowerFace.textContent = val;
+
+                topFace.textContent = val;
+                bottomFace.textContent = val;
+            }
+
+            renderValue(initialValue);
+
+            function flipTo(newVal) {
+
+                // IMPORTANT:
+                // Allow first render properly
+                if (newVal === current && !animating) {
+
+                    renderValue(newVal);
+
+                    return;
+                }
+
+                if (animating) return;
+
+                animating = true;
+
+                topFace.textContent = current;
+                bottomFace.textContent = current;
+
+                flipTop.classList.remove('flipping');
+                flipBottom.classList.remove('flipping');
+
+                void flipTop.offsetWidth;
+
+                flipTop.classList.add('flipping');
+
+                setTimeout(() => {
+
+                    flipBottom.classList.add('flipping');
+
+                }, 210);
+
+                setTimeout(() => {
+
+                    current = newVal;
+
+                    renderValue(newVal);
+
+                    setTimeout(() => {
+
+                        flipTop.classList.remove('flipping');
+                        flipBottom.classList.remove('flipping');
+
+                        animating = false;
+
+                    }, 100);
+
+                }, 290);
+            }
+
+            return {
+                element: flipUnit,
+                flipTo
+            };
+        }
+        // ============================================
+        // BUILD GROUPS
+        // ============================================
+
+        const groups = [
+            "YEARS",
+            "MONTHS",
+            "WEEKS",
+            "DAYS",
+            "HOURS",
+            "MINUTES",
+            "SECONDS"
+        ];
+
+        const clock = document.getElementById('clock');
+
+        const digitMap = {};
+
+        groups.forEach(groupName => {
+
+            const group = document.createElement('div');
+            group.className = 'group';
+
+            const digits = document.createElement('div');
+            digits.className = 'digits';
+
+            digitMap[groupName] = [];
+
+            for (let i = 0; i < 2; i++) {
+
+                const digit = createFlipDigit('0');
+
+                digitMap[groupName].push(digit);
+
+                digits.appendChild(digit.element);
+            }
+
+            const label = document.createElement('div');
+            label.className = 'label';
+            label.textContent = groupName;
+
+            group.appendChild(digits);
+            group.appendChild(label);
+
+            clock.appendChild(group);
+        });
+
+        // ============================================
+        // START DATE
+        // ============================================
+
+        const startDate = new Date("2026-02-15T00:00:00");
+
+        // ============================================
+        // ACCURATE DATE DIFFERENCE
+        // ============================================
+
+        function calculateDifference(start, end) {
+
+            // Before start date
+            if (end < start) {
+
+                return {
+                    years: 0,
+                    months: 0,
+                    weeks: 0,
+                    days: 0,
+                    hours: 0,
+                    minutes: 0,
+                    seconds: 0
+                };
+            }
+
+            let temp = new Date(start);
+
+            let years = 0;
+            let months = 0;
+
+            // YEARS
+            while (true) {
+
+                const next = new Date(temp);
+
+                next.setFullYear(next.getFullYear() + 1);
+
+                if (next <= end) {
+                    years++;
+                    temp = next;
+                } else {
+                    break;
+                }
+            }
+
+            // MONTHS
+            while (true) {
+
+                const next = new Date(temp);
+
+                next.setMonth(next.getMonth() + 1);
+
+                if (next <= end) {
+                    months++;
+                    temp = next;
+                } else {
+                    break;
+                }
+            }
+
+            // REMAINING TIME
+            // ============================================
+            // TOTAL TIME DIFFERENCE
+            // ============================================
+
+            const totalMs = end - start;
+
+            const totalSeconds = Math.floor(totalMs / 1000);
+
+            const totalDays = Math.floor(totalSeconds / 86400);
+
+            // TOTAL WEEKS FROM START DATE
+            const weeks = Math.floor(totalDays / 7);
+
+            // REMAINING DAYS AFTER WEEKS
+            const days = totalDays % 7;
+
+            const hours = Math.floor(totalSeconds / 3600) % 24;
+
+            const minutes = Math.floor(totalSeconds / 60) % 60;
+
+            const seconds = totalSeconds % 60;
+
+            return {
+                years,
+                months,
+                weeks,
+                days,
+                hours,
+                minutes,
+                seconds
+            };
+        }
+
+        // ============================================
+        // UPDATE DISPLAY
+        // ============================================
+
+        function updateCounter() {
+
+            const now = new Date();
+
+            const diff = calculateDifference(startDate, now);
+
+            const values = {
+                YEARS: diff.years,
+                MONTHS: diff.months,
+                WEEKS: diff.weeks,
+                DAYS: diff.days,
+                HOURS: diff.hours,
+                MINUTES: diff.minutes,
+                SECONDS: diff.seconds
+            };
+
+            Object.keys(values).forEach(key => {
+
+                const value = String(values[key]).padStart(2, '0');
+
+                digitMap[key][0].flipTo(value[0]);
+                digitMap[key][1].flipTo(value[1]);
+
+            });
+        }
+
+        // Start
+        updateCounter();
+
+        // Update every second
+        setInterval(updateCounter, 1000);
+
+    </script>
+
+</body>
+
+</html>
